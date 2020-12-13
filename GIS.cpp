@@ -18,7 +18,7 @@ std::vector<EntityId> GIS::loadMapFile(const std::string& filename) {;
 }
 
 //the function saves all data into a map file and returns the number of entities that were saved, the saved entities must include their Ids
-std::size_t GIS::saveMapFile(const std::string& filename) {
+std::size_t GIS::saveMapFile(const std::string& filename) const {
 	std::string str = filename;
     str = "";	
 	return 8;
@@ -32,7 +32,7 @@ std::size_t GIS::saveMapFile(const std::string& filename) {
 //partial_search.txt: explaining what you did and why qualify for bonus - include where code handels this exceptional partial search
 //mapFile.json with 10-20 entities
 //A file named: partial_search_test.cpp that includes a google test that passes and demonstrates your exceptional search
-std::vector<EntityId> GIS::getEntities(const std::string& search_name) {
+std::vector<EntityId> GIS::getEntities(const std::string& search_name) const {
 	std::vector<EntityId> res;
 	if (search_name == "Washington Square Park") {
 		res.emplace_back(EntityId("P1001"));
