@@ -51,7 +51,7 @@ public:
 	 * @param filename - Name of mapfile to be saved
 	 * @return std::size_t 
 	 */
-	std::size_t saveMapFile(const std::string& filename);
+	std::size_t saveMapFile(const std::string& filename) const;
 	
 	/**
 	 * @brief Get the Entities that match the search_name
@@ -63,7 +63,7 @@ public:
 	 *         	   match based on the category tags, etc. Partial match may work differently when the search is coordinates based or not
 	 *             Note: partial match implementation is not mandatory, however it may grant you a bonus (See info in ex doc). 
 	 */
-	std::vector<EntityId> getEntities(const std::string& search_name);
+	std::vector<EntityId> getEntities(const std::string& search_name) const;
 
 	/**
 	 * @brief Get the Entities that match the search_name in a specific area provided by a circle
@@ -72,7 +72,7 @@ public:
 	 * @param radius 
 	 * @return std::vector<EntityId> - EntityIds of all entities that match the search_name and in proivded area
 	 */
-	std::vector<EntityId> getEntities(const std::string& search_name, const Coordinates&, Meters radius);
+	std::vector<EntityId> getEntities(const std::string& search_name, const Coordinates&, Meters radius) const;
 		
 	/**
 	 * @brief Get closest point on given enity's perimeter to the given Coordinates
@@ -84,7 +84,7 @@ public:
 	 *                                      [2] Otherwise, returns the closest Coordinates, on entity's perimeter, to the provided Coordinates.
 	 *                                          The Coordinates shall be a point on a the entity's geometry that is closest to the given Coordinates.
 	 */
-	std::optional<Coordinates> getEntityClosestPoint(const EntityId& entity, const Coordinates& c);
+	std::optional<Coordinates> getEntityClosestPoint(const EntityId& entity, const Coordinates& c) const;
 
 	/**
 	 * @brief Get the closest point along a Way that is closest to Referenced Point and the EntityId of that Way
@@ -92,7 +92,7 @@ public:
 	 * @param c - Referenced Point 
 	 * @return std::pair<Coordinates, EntityId> - The Coordinates of closest point along a Way that is closest to Referenced Point and the EntityId of that Way
 	 */
-	std::pair<Coordinates, EntityId> getWayClosestPoint(const Coordinates& c);
+	std::pair<Coordinates, EntityId> getWayClosestPoint(const Coordinates& c) const;
 
 	/* ex2 functionality */
 
