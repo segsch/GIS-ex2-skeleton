@@ -62,10 +62,95 @@ TEST(DoubleNamedType, Functionality) {
     EXPECT_EQ(d, Meters { 0.008 });
     EXPECT_EQ(d, Meters { 0.012 });
     EXPECT_EQ(d->roundToPrecision(), 0.01);
-
+    double ddd = static_cast<double>(d);
+    EXPECT_TRUE(ddd > 0.007999 && ddd < 0.008001);
     EXPECT_EQ(Meters {1.234567}, Meters {1.23});
     EXPECT_EQ(Meters {1.235}, Meters {1.24});
     EXPECT_TRUE(Meters {1.235} > Meters {1.23});
+
+    // we want to allow the below, i.e. treat Double as double
+    EXPECT_EQ(Double<0> {1} * Meters {1}, Meters {1});
+    EXPECT_EQ(Double<2> {1} * Meters {1}, Meters {1});
+    EXPECT_EQ(Meters {1} * Double<3> {1}, Meters {1});
+    EXPECT_EQ(Meters {1} * Double<2> {1}, Meters {1});
+}
+
+template<class T, class U>
+  concept SupportsMultiplication =
+    requires(const std::remove_reference_t<T>& t,
+             const std::remove_reference_t<U>& u) {
+        t * u;
+    };
+
+template<class T, class U>
+  concept SupportsDivision =
+    requires(const std::remove_reference_t<T>& t,
+             const std::remove_reference_t<U>& u) {
+        t / u;
+    };
+
+template<class T, class U>
+  concept SupportsPlus =
+    requires(const std::remove_reference_t<T>& t,
+             const std::remove_reference_t<U>& u) {
+        t + u;
+    };
+
+template<class T, class U>
+  concept SupportsMinus =
+    requires(const std::remove_reference_t<T>& t,
+             const std::remove_reference_t<U>& u) {
+        t - u;
+    };
+
+template<class T, class U>
+  concept SupportsPow =
+    requires(const std::remove_reference_t<T>& t,
+             const std::remove_reference_t<U>& u) {
+        std::pow(t, u);
+    };
+
+TEST(DoubleNamedTypes, FunctionalityAndCompilation) {
+    // the below is blocked as it should be:
+    //assert (Meters {1.235} == Minutes {1.235});
+
+    // Test Functional
+    EXPECT_FALSE((std::equality_comparable_with<Meters, Minutes>));
+    EXPECT_TRUE((std::equality_comparable_with<Minutes, Minutes>));
+
+    EXPECT_TRUE((SupportsMultiplication<Meters, double>));
+    EXPECT_TRUE((SupportsMultiplication<Meters, Double<0>>));
+    EXPECT_FALSE((SupportsMultiplication<Meters, Meters>));
+    EXPECT_FALSE((SupportsMultiplication<Meters, Minutes>));
+    EXPECT_FALSE((SupportsMultiplication<NamedTypeDouble<0>, Meters>));
+    EXPECT_FALSE((SupportsMultiplication<Meters, NamedTypeDouble<2>>));
+    EXPECT_FALSE((SupportsPlus<Meters, Minutes>));
+    EXPECT_TRUE((SupportsPlus<Meters, Meters>));
+    EXPECT_FALSE((SupportsMinus<Meters, Minutes>));
+    EXPECT_TRUE((SupportsMinus<Meters, Meters>));
+    EXPECT_FALSE((SupportsDivision<Meters, Minutes>));
+    EXPECT_FALSE((SupportsDivision<Double<2>, Meters>));
+    EXPECT_TRUE((SupportsDivision<Meters, Meters>));
+    EXPECT_TRUE((SupportsDivision<Meters, double>));
+
+    // the below are blocked as they should be:
+    // assert (Meters {1.235} == Minutes {1.235});
+    // assert (Meters {1} * Meters {1} == 1);
+    // assert (Meters {1} + Minutes {1} == 2);
+    // assert (Meters {1} - Minutes {1} == 0);
+    // assert (Meters {1} * Minutes {1} == 1);
+    // assert (Meters {1} / Minutes {1} == 1);
+    // assert (Double<2> {1} / Meters {1} == 1);
+    // assert (NamedTypeDouble<0> {1} * Meters {1} == Meters {1} );
+    // assert (Meters {1} * NamedTypeDouble<2> {1} == Meters {1} );
+
+    // EXPECT_TRUE((std::equality_comparable_with<std::pow(Meters {2}, Meters {2}), 8>));
+
+    // implicit cast to double is removed
+    // the below doesn't compile:
+    // double result = std::pow(Meters {2}, Meters {2});
+    // but this does:
+    EXPECT_EQ( std::pow(static_cast<double>(Meters {2}), static_cast<double>(Meters {2})), 4 );
 }
 
 TEST(Coordinates, Comparison) {
@@ -468,14 +553,14 @@ TEST(CoordinatesMath, HalfHemisphereDistance) {
 TEST(CoordinatesMath, coordinatesByBearingAndDistance) {
     Coordinates s_pole{Longitude{100.3321}, Latitude{-90}}; 
     auto expected_n_pole = CoordinatesMath::coordinatesByBearingAndDistance(s_pole, 0, Meters{ 2 * CoordinatesMath::half_earth_hemisphere});
-    EXPECT_EQ(expected_n_pole.latitude(), 90);
+    EXPECT_EQ(expected_n_pole.latitude(), CoordinatesMath::n_pole_lat);
     Coordinates n_pole{Longitude{-10.3321}, Latitude{90}}; 
     auto expected_s_pole = CoordinatesMath::coordinatesByBearingAndDistance(n_pole, 180, Meters{ 2 * CoordinatesMath::half_earth_hemisphere});
-    EXPECT_EQ(expected_s_pole.latitude(), -90);
+    EXPECT_EQ(expected_s_pole.latitude(), CoordinatesMath::s_pole_lat);
     auto expected_equator1 = CoordinatesMath::coordinatesByBearingAndDistance(n_pole, 180, Meters{ CoordinatesMath::half_earth_hemisphere});
-    EXPECT_EQ(expected_equator1.latitude(), 0);
+    EXPECT_EQ(expected_equator1.latitude(), CoordinatesMath::equator_lat);
     auto expected_equator2 = CoordinatesMath::coordinatesByBearingAndDistance(s_pole, 0, Meters{ CoordinatesMath::half_earth_hemisphere});
-    EXPECT_EQ(expected_equator2.latitude(), 0);
+    EXPECT_EQ(expected_equator2.latitude(), CoordinatesMath::equator_lat);
     const double lng=48.853701;
     const double lat=2.292292;
     Coordinates point{Longitude{lng}, Latitude{lat}};

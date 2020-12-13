@@ -30,6 +30,7 @@ class Double {
     }
 
 public:
+    static constexpr size_t precision = Precision;
     static constexpr double precision_factor = tenToThePowerOf<Precision>();
     
     constexpr Double(double val) : _val(val) {}
@@ -59,12 +60,18 @@ public:
 };
 
 template<typename T>
-concept Number = std::integral<T> || std::floating_point<T>;
+concept Number = std::integral<T> || std::floating_point<T> || std::same_as<T, Double<T::precision>>;
 
 template<std::size_t Precision, typename Type = Double<Precision>>
 struct NamedTypeDouble : NamedType<Double<Precision>> {
     using NamedType<Double<Precision>>::NamedType;
-    constexpr operator double() const {
+
+    //---------------------------------------------
+    // NOTE: the cast to double is now explicit
+    // if you need a cast to double you should do
+    // an implicit casting!
+    //---------------------------------------------
+    constexpr explicit operator double() const {
         return static_cast<const Double<Precision>&>(*this);
     };
 
@@ -77,20 +84,20 @@ struct NamedTypeDouble : NamedType<Double<Precision>> {
         d1 = d1 - d2;
         return d1;
     }
-    
+
     friend constexpr Type operator+(Type d1, Type d2) {
         return Type { d1.val + d2.val };
     }
-    
+
     friend constexpr Type operator-(Type d1, Type d2) {
         return Type { d1.val - d2.val };
     }
-	
-    friend constexpr bool operator==(Type d1, Type d2) {
+
+	friend constexpr bool operator==(Type d1, Type d2) {
 	    return d1.val == d2.val;
 	}
-	
-    friend constexpr auto operator<=>(Type d1, Type d2) {
+    
+	friend constexpr auto operator<=>(Type d1, Type d2) {
 	    return d1.val <=> d2.val;
 	}
 
@@ -106,18 +113,15 @@ struct NamedTypeDouble : NamedType<Double<Precision>> {
         return Type { d1.val / d2 };
     }
 
-    friend constexpr Type operator/(Number auto d1, Type d2) = delete;
-
     friend constexpr double operator/(Type d1, Type d2) {
         return d1.val / d2.val;
     }
 
-    // the base class doesn't support this operation
+    // Note that the base class doesn't support the operation: Type * Type
     // the actual type may allow it (e.g. Meters * Meters => SquareMeters)
-    friend constexpr auto operator*(Type d1, Type d2) = delete;
     
-    friend constexpr bool operator==(Type lhs, Number auto rhs) = delete;
-    friend constexpr bool operator==(Number auto lhs, Type rhs) = delete;
-    friend constexpr bool operator<=>(Type lhs, Number auto rhs) = delete;
-    friend constexpr bool operator<=>(Number auto lhs, Type rhs) = delete;
+    friend constexpr bool operator==(Type lhs, auto rhs) = delete;
+    friend constexpr bool operator==(auto lhs, Type rhs) = delete;
+    friend constexpr bool operator<=>(Type lhs, auto rhs) = delete;
+    friend constexpr bool operator<=>(auto lhs, Type rhs) = delete;
 };
