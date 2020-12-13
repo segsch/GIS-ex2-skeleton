@@ -4,7 +4,6 @@
 #include <vector> 
 #include <optional>
 #include "GISNamedTypes.h"
-#include "Grid.h"
 #include "Way.h"
 #include "Restrictions.h"
 
