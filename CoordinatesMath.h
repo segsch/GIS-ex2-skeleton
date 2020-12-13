@@ -32,16 +32,24 @@ class CoordinatesMath {
 	/**
 	 * @brief The function convert degrees into radians
 	 * 
-	 * @param rad 
-	 * @return double 
+	 * @param deg
+	 * @return double - degree in radians  
 	 */
 	static double deg2rad(double deg) { return deg * std::numbers::pi / 180; }
+
+	/**
+	 * @brief The function convert degrees into radians
+	 * 
+	 * @param deg - As decimal Coordinate
+	 * @return double - in Radians
+	 */
+	static double deg2rad(LongLat auto deg) { return deg2rad(static_cast<double>(deg)); }
 
 	/**
 	 * @brief The function convert radians into degrees
 	 * 
 	 * @param rad 
-	 * @return double 
+	 * @return double - in Degrees
 	 */
 	static double rad2deg(double rad) { return rad * 180 / std::numbers::pi; }
 
@@ -263,8 +271,9 @@ public:
 	 */
 	static constexpr Meters earth_radius { 6'371'000 }; 
 	static constexpr Meters half_earth_hemisphere { earth_radius * std::numbers::pi / 2 }; 	
-	static constexpr double n_pole_lat = 90; 
-	static constexpr double s_pole_lat = -90; 
+	static constexpr Latitude n_pole_lat { 90 }; 
+	static constexpr Latitude s_pole_lat { -90 }; 
+	static constexpr Latitude equator_lat { 0 }; 
 
 	/**
 	 * @brief Constrain degrees to range 0..+360 (e.g. for bearing)

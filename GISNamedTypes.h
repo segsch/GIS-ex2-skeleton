@@ -1,14 +1,17 @@
 #pragma once 
 
 #include <string>
-
 #include "NamedType.h"
 #include "Double.h"
 
 constexpr std::size_t coordinate_precision = 6;
-using Coordinate = NamedTypeDouble<coordinate_precision>;
-struct Longitude: Coordinate { using Coordinate::Coordinate; };
-struct Latitude: Coordinate { using Coordinate::Coordinate; };
+template<typename Type>
+using Coordinate = NamedTypeDouble<coordinate_precision, Type>;
+struct Longitude: Coordinate<Longitude> { using Coordinate<Longitude>::Coordinate; };
+struct Latitude: Coordinate<Latitude> { using Coordinate<Latitude>::Coordinate; };
+
+template<typename T>
+concept LongLat = std::same_as<T, Longitude> || std::same_as<T, Latitude>;
 
 constexpr std::size_t meters_precision = 2;
 struct Meters: NamedTypeDouble<meters_precision, Meters> {
