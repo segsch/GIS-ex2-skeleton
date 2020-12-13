@@ -9,7 +9,6 @@
 
 /**
  * @brief GIS classs
- *        Note: all functions below may or may not be const (i.e. may oblige not to alter the GIS system, or decide not to oblige), the tests would not assume constness of the functions, but you can make them const if you see it appropriate.
  * 
  */
 class GIS {
@@ -18,12 +17,7 @@ class GIS {
 
 public:
 
-    /* ex1 functionality: 
-     *
-	 * Your GIS should support the following public API:
-	 *
-	 * NOTE: all functions below may or may not be const (i.e. may oblige not to alter the GIS system, or decide not to oblige), the tests would not assume constness of the functions, but you should make them const if you see it appropriate.
-	 */
+    /* ex1 functionality: */
 
 	/**
 	 * @brief Clears all data from the system
