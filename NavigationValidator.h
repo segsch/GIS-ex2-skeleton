@@ -39,6 +39,6 @@ public:
      * @return true - Route is valid 
      * @return false - Route is not valid
      */
-    bool validateRoute(const Coordinates& start, const Coordinates& start, const Restrictions& res, const Route& r) const;
+    bool validateRoute(const Coordinates& start, const Coordinates& end, const Restrictions& res, const Route& r) const;
 };
 
